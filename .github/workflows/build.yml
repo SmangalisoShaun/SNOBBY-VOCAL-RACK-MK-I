@@ -1,0 +1,26 @@
+name: Build SNOBBY VOCAL RACK MK I
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get JUCE
+        run: git clone --depth 1 --branch 8.0.4 https://github.com/juce-framework/JUCE.git JUCE
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build VST3
+        run: cmake --build build --config Release --target BoomhypeVocalRack_VST3
+      - name: Collect
+        shell: bash
+        run: |
+          mkdir out
+          cp -r build/BoomhypeVocalRack_artefacts/Release/VST3/*.vst3 out/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SNOBBY-VOCAL-RACK-MK-I-VST3-Windows
+          path: out
